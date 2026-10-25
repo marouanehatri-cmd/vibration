@@ -7,6 +7,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Unzip project
+        run: |
+          ZIP=$(ls *.zip | head -1)
+          echo "Using $ZIP"
+          unzip -o -q "$ZIP"
+          ls Vibration
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -15,8 +21,10 @@ jobs:
         with:
           gradle-version: 8.4
       - name: Build release APK
+        working-directory: Vibration
         run: gradle :app:assembleRelease --no-daemon
       - name: Check size (under 15 MB)
+        working-directory: Vibration
         run: |
           APK=$(ls app/build/outputs/apk/release/*.apk | head -1)
           ls -l "$APK"
@@ -25,4 +33,4 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: Vibration
-          path: Vibration.apk
+          path: Vibration/Vibration.apk
